@@ -1,0 +1,4 @@
+*.orig
+*.reg
+*.tmp
+*.o

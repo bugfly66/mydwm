@@ -195,7 +195,7 @@ static void monocle(Monitor *m);
 static void motionnotify(XEvent *e);
 static void movemouse(const Arg *arg);
 static Client *nexttiled(Client *c);
-static void pop(Client *c);
+// static void pop(Client *c);
 static void propertynotify(XEvent *e);
 static void quit(const Arg *arg);
 static Monitor *recttomon(int x, int y, int w, int h);
@@ -1289,14 +1289,14 @@ nexttiled(Client *c)
 	return c;
 }
 
-void
+/*void
 pop(Client *c)
 {
 	detach(c);
 	attach(c);
 	focus(c);
 	arrange(c->mon);
-}
+}*/
 
 void
 propertynotify(XEvent *e)
@@ -1485,7 +1485,7 @@ runautostart(void)
 	char *xdgdatahome;
 	char *home;
 	struct stat sb;
-
+	int status = 0;
 	if ((home = getenv("HOME")) == NULL)
 		/* this is almost impossible */
 		return;
@@ -1539,7 +1539,7 @@ runautostart(void)
 	}
 
 	if (access(path, X_OK) == 0)
-		system(path);
+		status = system(path);
 
 	/* now the non-blocking script */
 	if (sprintf(path, "%s/%s", pathpfx, autostartsh) <= 0) {
@@ -1548,8 +1548,12 @@ runautostart(void)
 	}
 
 	if (access(path, X_OK) == 0)
-		system(strcat(path, " &"));
-
+		status = system(strcat(path, " &"));
+	if (status == -1)
+	{
+		die("system error");
+	}
+	
 	free(pathpfx);
 	free(path);
 }

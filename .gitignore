@@ -2,3 +2,5 @@
 *.rej
 *.tmp
 *.o
+dwm
+.vscode/*

@@ -1,0 +1,2 @@
+- when toggle on fullscreen, hide all screen expect the fullscreen application,and when toggle off fullscreen show all application
+- fix the bug that when in fullscreen mode,there are little gaps at the right and bottom of the screen 

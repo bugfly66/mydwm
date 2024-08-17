@@ -1,5 +1,4 @@
 /* See LICENSE file for copyright and license details. */
-
 /* appearance */
 static const unsigned int borderpx  = 5;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
@@ -30,11 +29,24 @@ static const char *colors[][3]      = {
 static const unsigned int alphas[][3]      = {
     /*               fg      bg        border*/
     [SchemeNorm] = { OPAQUE, baralpha, borderalpha },
-       [SchemeSel]  = { OPAQUE, baralpha, borderalpha },
+    [SchemeSel]  = { OPAQUE, baralpha, borderalpha },
+};
+
+/*autostart command*/
+static const char *const autostart[] = {
+    "xrandr","--output","eDP","--mode","3072x1920","--rate","120",NULL,
+	"sh","-c","~/scripts/wp-autochange.sh","&",NULL,
+	"sh","-c","~/scripts/tap-to-click.sh","&",NULL,
+	"sh","-c","~/scripts/statusbar-refresh.sh","&",NULL,
+	"picom","-b",NULL,
+	"sudo","chronyd","-q",NULL,
+	"fcitx5","&",NULL,
+	"dunst","-config","~/.config/dunst.conf","&",NULL,
+    NULL /* terminate */
 };
 
 /* tagging */
-static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+static const char *tags[] = { "甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬","癸" };
 
 static const Rule rules[] = {
 	/* xprop(1):
@@ -86,15 +98,29 @@ static const Layout layouts[] = {
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 #define HOMEPATH "/home/zx/"
 /* commands */
+static char scratchpadname[] = "scratchpad"; 
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
+static const char *dmenucmd[] = { "rofi", "-show", "run", "-theme","rod", NULL };
 static const char *termcmd[]  = { "kitty", NULL };
-static const char scratchpadname[] = "scratchpad";
-static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "120x34", NULL };
-static const char *volup[]={HOMEPATH"scripts/volume-up.sh",NULL};
-static const char *voldown[]={HOMEPATH"scripts/volume-down.sh",NULL};
-static const char *voltoggle[]={HOMEPATH"scripts/volume-toggle.sh",NULL};
-static const char *captoggle[]={HOMEPATH"scripts/capture-toggle.sh",NULL};
+static const char *scratchpadcmd[] = { "st", "-t", scratchpadname,"-g", "120x34", NULL };
+//static const char *browsercmd[] = {"microsoft-edge-stable", NULL};
+static const char *zoterocmd[] = {"zotero", NULL};
+static const char *codecmd[] = {"code", NULL};
+static const char *volupcmd[]={HOMEPATH"scripts/volume-up.sh",NULL};
+static const char *voldowncmd[]={HOMEPATH"scripts/volume-down.sh",NULL};
+static const char *voltogglecmd[]={HOMEPATH"scripts/volume-toggle.sh",NULL};
+static const char *captogglecmd[] = {HOMEPATH"scripts/capture-toggle.sh",NULL};
+static const char *brightnessupcmd[] = {HOMEPATH"scripts/brightness-up.sh",NULL};
+static const char *brightnessdowncmd[] = {HOMEPATH"scripts/brightness-down.sh",NULL};
+static const char *touchpadtogglecmd[]={HOMEPATH"scripts/toggle-touchpad.sh",NULL};
+
+Autostarttag autostarttaglist[] = {
+       {.cmd = termcmd, .tags = 1 << 0 },
+       {.cmd = zoterocmd, .tags = 1 << 1 },
+       {.cmd = codecmd, .tags = 1 << 2 },
+       {.cmd = NULL, .tags = 0 },
+};
+
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
@@ -141,13 +167,13 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
-	{ MODKEY,                       XK_F1,     spawn,          {.v = voltoggle} },
-	{ MODKEY,                       XK_F2,     spawn,          {.v = voldown} },
-	{ MODKEY,                       XK_F3,     spawn,          {.v = volup} },
-	{ MODKEY,                       XK_F4,     spawn,          {.v = captoggle} },
-	{ MODKEY,                       XK_F5,     spawn,          SHCMD("light -U 5")},
-	{ MODKEY,                       XK_F6,     spawn,          SHCMD("light -A 5")},
-	{ MODKEY,                       XK_F8,     spawn,          SHCMD("~/scripts/toggle-touchpad.sh")},
+	{ MODKEY,                       XK_F1,     spawn,          {.v = voltogglecmd} },
+	{ MODKEY,                       XK_F2,     spawn,          {.v = voldowncmd} },
+	{ MODKEY,                       XK_F3,     spawn,          {.v = volupcmd} },
+	{ MODKEY,                       XK_F4,     spawn,          {.v = captogglecmd} },
+	{ MODKEY,                       XK_F5,     spawn,          {.v = brightnessdowncmd}},
+	{ MODKEY,                       XK_F6,     spawn,          {.v = brightnessupcmd}},
+	{ MODKEY,                       XK_F8,     spawn,          {.v = touchpadtogglecmd}},
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)

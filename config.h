@@ -19,21 +19,45 @@ static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
 static const char col_gray3[]       = "#bbbbbb";
 static const char col_gray4[]       = "#eeeeee";
-static const char col_gray5[]       = "#63e398";
 static const char col_cyan[]        = "#005577";
+static const char col1[]            = "#63e398";
+static const char col2[]            = "#00ffff";
+static const char col3[]            = "#ff00ff";
+static const char col4[]            = "#ffff00";
+static const char col5[]            = "#ffffff";
+static const char col6[]            = "#ffffff";
+static const char warn[]			= "#eed202";
+static const char err[]				= "#ee0000";
 static const unsigned int baralpha = 0x99;
 static const unsigned int borderalpha = OPAQUE;
-
+enum { SchemeNorm, SchemeSel,SchemeCol1, SchemeCol2, SchemeCol3, SchemeCol4,
+       SchemeCol5, SchemeCol6, SchemeWarn,SchemeErr}; /* color schemes */
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
-	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
-	[SchemeSel]  = { col_gray5, col_gray1,  col_cyan  },
+	[SchemeNorm] = { col_gray3,	col_gray1, col_gray2 },
+	[SchemeSel]  = { col1,		col_gray1, col_gray2  },
+	[SchemeCol1]  = { col1,		col_gray1, col_gray2 },
+	[SchemeCol2]  = { col2,		col_gray1, col_gray2 },
+	[SchemeCol3]  = { col3,		col_gray1, col_gray2 },
+	[SchemeCol4]  = { col4,		col_gray1, col_gray2 },
+	[SchemeCol5]  = { col5,		col_gray1, col_gray2 },
+	[SchemeCol6]  = { col6,		col_gray1, col_gray2 },
+	[SchemeWarn]  = { warn,		col_gray1, col_gray2 },
+	[SchemeErr]  = { err,		col_gray1, col_gray2 },
 };
 
 static const unsigned int alphas[][3]      = {
     /*               fg      bg        border*/
     [SchemeNorm] = { OPAQUE, baralpha, borderalpha },
     [SchemeSel]  = { OPAQUE, baralpha, borderalpha },
+	[SchemeCol1]  = { OPAQUE, baralpha, borderalpha },
+	[SchemeCol2]  = { OPAQUE, baralpha, borderalpha },
+	[SchemeCol3]  = { OPAQUE, baralpha, borderalpha },
+	[SchemeCol4]  = { OPAQUE, baralpha, borderalpha },
+	[SchemeCol5]  = { OPAQUE, baralpha, borderalpha },
+	[SchemeCol6]  = { OPAQUE, baralpha, borderalpha },
+	[SchemeWarn]  = { OPAQUE, baralpha, borderalpha },
+	[SchemeErr]  = { OPAQUE, baralpha, borderalpha },
 };
 
 /*autostart command*/
@@ -41,16 +65,19 @@ static const char *const autostart[] = {
     "xrandr","--output","eDP","--mode","3072x1920","--rate","120",NULL,
 	"sh","-c","~/scripts/wp-autochange.sh","&",NULL,
 	"sh","-c","~/scripts/tap-to-click.sh","&",NULL,
-	"sh","-c","~/scripts/statusbar-refresh.sh","&",NULL,
+    "sh","-c","~/scripts/inverse-scroll.sh","&",NULL,
+	//"sh","-c","~/scripts/statusbar-refresh.sh","&",NULL,
 	"picom","-b",NULL,
 	"sudo","chronyd","-q",NULL,
 	"fcitx5","&",NULL,
+	"sh","-c","~/scripts/musicctl","&",NULL,
 	"dunst","-config","~/.config/dunst.conf","&",NULL,
+	"dsblocks","&",NULL,
     NULL /* terminate */
 };
 
 /* tagging */
-static const char *tags[] = { "甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬","癸" };
+static const char *tags[] = { " ₁", " ₂", " ₃", " ₄", " ₅", " ₆", " ₇",  " ₈", };
 static const unsigned int ulinepad	= 0;	/* horizontal padding between the underline and tag */
 static const unsigned int ulinestroke	= 4;	/* thickness / height of the underline */
 static const unsigned int ulinevoffset	= 0;	/* how far above the bottom of the bar the line should appear */
@@ -77,7 +104,7 @@ static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen win
 
 static const Layout layouts[] = {
 	/* symbol     arrange function */
-	{ "[]=",      tile },    /* first entry is default */
+	{ " ",      tile },    /* first entry is default */
 	{ "[M]",      monocle },
 	{ "[@]",      spiral },
 	{ "[\\]",     dwindle },
@@ -108,7 +135,7 @@ static const Layout layouts[] = {
 /* commands */
 static char scratchpadname[] = "scratchpad"; 
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "rofi", "-show", "run", "-theme","rod", NULL };
+static const char *dmenucmd[] = { "rofi", "-show", "drun", "-theme","rod", NULL };
 static const char *termcmd[]  = { "kitty", NULL };
 static const char *scratchpadcmd[] = { "st", "-t", scratchpadname,"-g", "120x34", NULL };
 //static const char *browsercmd[] = {"microsoft-edge-stable", NULL};
@@ -201,7 +228,10 @@ static const Button buttons[] = {
 	{ ClkLtSymbol,          0,              Button1,        setlayout,      {0} },
 	{ ClkLtSymbol,          0,              Button3,        setlayout,      {.v = &layouts[2]} },
 	{ ClkWinTitle,          0,              Button2,        zoom,           {0} },
-	{ ClkStatusText,        0,              Button2,        spawn,          {.v = termcmd } },
+	// { ClkStatusText,        0,              Button2,        spawn,          {.v = termcmd } },
+	{ ClkStatusText,        0,              Button1,        sigdsblocks,    {.i = 1} },
+	{ ClkStatusText,        0,              Button2,        sigdsblocks,    {.i = 2} },
+	{ ClkStatusText,        0,              Button3,        sigdsblocks,    {.i = 3} },
 	{ ClkClientWin,         MODKEY,         Button1,        movemouse,      {0} },
 	{ ClkClientWin,         MODKEY,         Button2,        togglefloating, {0} },
 	{ ClkClientWin,         MODKEY,         Button3,        resizemouse,    {0} },

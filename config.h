@@ -62,7 +62,7 @@ static const unsigned int alphas[][3]      = {
 
 /*autostart command*/
 static const char *const autostart[] = {
-    "xrandr","--output","eDP","--mode","3072x1920","--rate","120",NULL,
+//    "xrandr","--output","eDP","--mode","3072x1920","--rate","120",NULL,
 	"sh","-c","~/scripts/wp-autochange.sh","&",NULL,
 	"sh","-c","~/scripts/tap-to-click.sh","&",NULL,
     "sh","-c","~/scripts/inverse-scroll.sh","&",NULL,
@@ -91,6 +91,7 @@ static const Rule rules[] = {
 	/* class      instance    title       tags mask     isfloating   monitor */
 	{ "Gimp",     NULL,       NULL,       0,            1,           -1 },
 	{ "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 },
+	{ "edge",  "microsoft-edge",       NULL,       1 << 8,       0,           -1 },
 };
 
 /* layout(s) */
@@ -189,7 +190,7 @@ static const Key keys[] = {
 	{ MODKEY|Mod1Mask,              XK_0,      togglegaps,     {0} },
 	{ MODKEY|Mod1Mask|ShiftMask,    XK_0,      defaultgaps,    {0} },
 	{ MODKEY,                       XK_Tab,    view,           {0} },
-	{ MODKEY|ShiftMask,             XK_c,      killclient,     {0} },
+	{ MODKEY,                       XK_c,      killclient,     {0} },
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
 	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },
 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
